@@ -6,7 +6,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from typing import List, Optional
 import uuid
 import os
-from datetime import datetime, date, timezone
+from datetime import datetime, date, timezone, timedelta
 from dotenv import load_dotenv
 
 # Load environment variables
