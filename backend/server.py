@@ -213,6 +213,22 @@ async def get_inventory(category: Optional[str] = None, status: Optional[str] = 
     
     return [InventoryItem(**item) for item in items]
 
+# Search and filtering - MUST be before {item_id} route to avoid conflicts
+@app.get("/api/inventory/search", response_model=List[InventoryItem])
+async def search_inventory(q: str):
+    """Search inventory items by name, manufacturer, or description"""
+    query = {
+        "$or": [
+            {"name": {"$regex": q, "$options": "i"}},
+            {"manufacturer": {"$regex": q, "$options": "i"}},
+            {"description": {"$regex": q, "$options": "i"}},
+            {"batch_number": {"$regex": q, "$options": "i"}}
+        ]
+    }
+    
+    items = await db.inventory.find(query).sort("created_at", -1).to_list(length=None)
+    return [InventoryItem(**item) for item in items]
+
 @app.get("/api/inventory/{item_id}", response_model=InventoryItem)
 async def get_inventory_item(item_id: str):
     """Get a specific inventory item"""
